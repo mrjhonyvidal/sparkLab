@@ -7,4 +7,4 @@ echo "\\h : help with SQL commands"
 echo "\\? : help with psql commands"
 echo "\\q : quit"
 echo "======================================"
-docker exec -it postgres psql -U docker -d scalalab
+docker exec -it postgres psql -U docker -d sparklab
