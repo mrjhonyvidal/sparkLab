@@ -1,5 +1,5 @@
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{col, column, expr}
+import org.apache.spark.sql.functions.{avg, col, column, count, countDistinct, expr, mean, stddev, sum}
 
 object ColumnsAndExpressions extends App {
 
@@ -170,4 +170,77 @@ object ColumnsAndExpressions extends App {
    *
    */
 
+  /**
+   * Data Science
+   * In statistics, the standard deviation is a measure of the amount of variation or dispersion of a set of values.
+   * A low standard deviation indicates that the values tend to be close to the mean
+   * (also called the expected value) of the set, while a high standard deviation indicates that the values
+   * are spread out over a wider range.
+   *
+   * In probability and statistics, the population mean, or expected value, is a measure of the central
+   * tendency either of a probability distribution or of the random variable characterized by that distribution.
+   * In a discrete probability distribution of a random variable X,
+   * the mean is equal to the sum over every possible value weighted by the probability of that value;
+   * that is, it is computed by taking the product of each possible value x of X and its probability p(x),
+   * and then adding all these products together, giving
+   * {\displaystyle \mu =\sum xp(x)....}{\displaystyle \mu =\sum xp(x)....}
+   *
+   * https://en.wikipedia.org/wiki/Mean
+   * https://en.wikipedia.org/wiki/Standard_deviation
+   */
+  moviesDF.select(
+    mean(col("Rotten_Tomatoes_Rating")), // Average or Mean
+    stddev(col("Rotten_Tomatoes_Rating")) // Standard Deviation on a scale of 0 to 100
+  ).show()
+
+  /**
+   * Result
+   * +---------------------------+-----------------------------------+
+   * |avg(Rotten_Tomatoes_Rating)|stddev_samp(Rotten_Tomatoes_Rating)|
+   * +---------------------------+-----------------------------------+
+   * |          54.33692373976734|                  28.07659263787602|
+   * +---------------------------+-----------------------------------+
+   */
+
+  // Grouping and Aggregation
+  val countByGenreDF = moviesDF.groupBy(col("Major_Genre")) // includes null
+    .avg("IMDB_Rating") // Aggregation
+    //.count() // select count(*) from moviesDF group by Major_Genre
+
+  val aggregationsByGenreDF = moviesDF
+    .groupBy(col("Major_Genre"))
+    .agg(
+      count("*").as("N_Movies"),
+      avg("IMDB_Rating").as("Avg_Rating")
+    )
+    .orderBy(col("Avg_Rating"))
+
+
+  // sum up all the profits
+  moviesDF
+    .select((col("US_Gross") + col("Worldwide_Gross") + col("US_DVD_Sales")).as("Total_Gross"))
+    .select(sum("Total_Gross"))
+
+  // Count how many distinct directors we have
+  moviesDF
+    .select(countDistinct(col("Director")))
+    //.show()
+
+  // Show the mean and standard deviations of US gross revenue for the movies
+  moviesDF
+    .select(
+      mean("US_Gross"),
+      stddev("US_Gross")
+    )
+    //.show() // Result x.E7 (10 ^ 7)
+
+  // Compute the average IMDB rating and the average US gross revenue PER DIRECTOR
+  moviesDF
+    .groupBy("Director")
+    .agg(
+      avg("IMDB_Rating").as("Avg_Rating"),
+      sum("US_Gross").as("Total_US_Gross")
+    )
+    .orderBy(col("Avg_Rating").desc_nulls_last)
+    .show()
 }
