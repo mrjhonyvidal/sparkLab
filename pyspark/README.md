@@ -1,13 +1,19 @@
-## Set up python env for Spark
+# INTRODUCTION
 
+You may find different projects of Spark and Python on each sub folder. 
+
+#### Set up python Jupyter notebook and Spark
+
+Below is one posible way of setting up your dev environment, a very useful and quick way of test is use: Codelab or Databricks for set up a cluster environment, the tools and run all the tests. 
 ```
 wget http://repo.continuum.io/archive/Anaconda3-4.1.1-Linux-x86_64.sh
-```
+
 which python3
 
 source .bashrc
 
 Instalar py4j:
+```
 
 ```
 export PATH=$PATH:$HOME/anaconda3/bin
